@@ -4,6 +4,6 @@ pragma solidity ^0.8.0;
 
 import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/LSP7DigitalAsset.sol";
 
-contract PlaceholderLSP7 is LSP7DigitalAsset("PlaceholderLSP7", "LSP7", msg.sender, false) {
+contract PlaceholderLSP7 is LSP7DigitalAsset("PlaceholderLSP7", "LSP7", msg.sender, true) {
 
 }

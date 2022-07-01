@@ -4,12 +4,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.sol";
-import "./SymbolAward.sol";
+import "./ReactionToken.sol";
 
 /**
  * @title UniversalProfileReputationSystem
  * @author B00ste
- * @custom:version 0.1
+ * @custom:version 0.3
  */
 contract UniversalProfileReputationSystem {
 
@@ -19,34 +19,100 @@ contract UniversalProfileReputationSystem {
   // --- ATTRIBUTES
 
   /**
-   * @notice Instance of the token, whoose holders can give symbols.
+   * @notice Instance of the token, whoose holders can give reactions.
    */
-  ILSP7DigitalAsset private mustHoldToken;
+  ILSP7DigitalAsset private pinkPill;
 
   /**
-   * @notice Ctreating 5 instances of symbol tokens to be awarded as reputation.
+   * @notice Instance of the token, whoose holders can give reactions.
    */
-  SymbolAward symbol1;
-  SymbolAward symbol2;
-  SymbolAward symbol3;
-  SymbolAward symbol4;
-  SymbolAward symbol5;
+  ILSP7DigitalAsset private greenPill;
 
   /**
-   * @notice This array holds the 5 symbols that can be given to an Universal Profile.
+   * @notice Ctreating 5 instances of reaction tokens to be awarded as reputation.
    */
-  SymbolAward[5] private symbols = [symbol1, symbol2, symbol3, symbol4, symbol5];
+  ReactionToken reaction1;
+  ReactionToken reaction2;
+  ReactionToken reaction3;
+  ReactionToken reaction4;
+  ReactionToken reaction5;
+  ReactionToken participationReaction;
 
   /**
-   * @notice The constructor saves a instance of the token at a certain address and creates 5 symbol tokens that will be awarded further.
+   * @notice This array holds the 5 reaction instances that can be given to an Universal Profile.
    */
-  constructor(address LSP7Address) {
-    mustHoldToken = ILSP7DigitalAsset(LSP7Address);
-    symbol2 = new SymbolAward(LSP7Address, unicode"👎", unicode"👎", msg.sender, true);
-    symbol1 = new SymbolAward(LSP7Address, unicode"😡", unicode"😡", msg.sender, true);
-    symbol3 = new SymbolAward(LSP7Address, unicode"👍", unicode"👍", msg.sender, true);
-    symbol4 = new SymbolAward(LSP7Address, unicode"👏", unicode"👏", msg.sender, true);
-    symbol5 = new SymbolAward(LSP7Address, unicode"💚", unicode"💚", msg.sender, true);
+  ReactionToken[5] private reactions = [reaction1, reaction2, reaction3, reaction4, reaction5];
+
+  /**
+   * @notice The constructor saves a instance of the token at a certain address and creates 5 reaction tokens that will be awarded further.
+   */
+  constructor(address pinkPillAddress, address greenPillAddress) {
+    pinkPill = ILSP7DigitalAsset(pinkPillAddress);
+    greenPill = ILSP7DigitalAsset(greenPillAddress);
+
+    //6th reaction awarded back for reacting. Tracks individuals participation.
+    participationReaction = new ReactionToken(
+      5,
+      address(0),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"🎟",
+      unicode"🎟",
+      msg.sender,
+      true
+    );
+
+    // Reaction Token initaited.
+    reaction1 = new ReactionToken(
+      0,
+      address(participationReaction),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"😡",
+      unicode"😡",
+      msg.sender,
+      true
+    );
+    reaction2 = new ReactionToken(
+      1,
+      address(participationReaction),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"👎",
+      unicode"👎",
+      msg.sender,
+      true
+    );
+    reaction3 = new ReactionToken(
+      2,
+      address(participationReaction),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"👍",
+      unicode"👍",
+      msg.sender,
+      true
+    );
+    reaction4 = new ReactionToken(
+      3,
+      address(participationReaction),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"👏",
+      unicode"👏",
+      msg.sender,
+      true
+    );
+    reaction5 = new ReactionToken(
+      4,
+      address(participationReaction),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"💚",
+      unicode"💚",
+      msg.sender,
+      true
+    );
   }
 
   // --- MODIFIERS
@@ -54,7 +120,7 @@ contract UniversalProfileReputationSystem {
   /**
    * @notice Verifies that the given number is 0, 1, 2, 3 or 4.
    */
-  modifier symbolNumberExists(uint number) {
+  modifier reactionNumberExists(uint number) {
     require(
       number >= 0 && number <= 4,
       "The provided number has no symbol to represent."
@@ -65,53 +131,53 @@ contract UniversalProfileReputationSystem {
   // --- GETTERS & SETTERS
 
   /**
-   * @notice Getter for the array of symbols.
+   * @notice Getter for the array of reactions.
    */
-  function getSymbols() external view returns(SymbolAward[5] memory) {
-    return symbols;
+  function getReactions() external view returns(address[5] memory) {
+    return [address(reactions[0]), address(reactions[1]), address(reactions[2]), address(reactions[3]), address(reactions[4])];
   }
 
   /**
-   * @notice Increases the number of symbols of the same type given.
+   * @notice Increases the number of reactions of the same type given.
    *
-   * @param universalProfileAddress The address of the Universal Profile whoose number of symbols of the same type is increased.
-   * @param awardedUniversalProfileAddress The address of the Universal profile that will be awarded a Symbol reputation token.
-   * @param symbolNumber The index number of the symbol.
+   * @param universalProfileAddress The address of the Universal Profile who will give a reaction.
+   * @param awardedUniversalProfileAddress The address of the Universal profile that will be given a reaction.
+   * @param reactionNumber The index number of the reaction.
    */
   function _awardSymbol(
     address universalProfileAddress,
     address awardedUniversalProfileAddress,
-    uint symbolNumber
+    uint reactionNumber
   ) private {
-    symbols[symbolNumber].mint(universalProfileAddress, awardedUniversalProfileAddress, 1, true, "");
+    reactions[reactionNumber].mint(universalProfileAddress, awardedUniversalProfileAddress, 1, true, "");
   }
 
   /**
-   * @notice Getter for the number of symbols of the same type given.
+   * @notice Getter for the number of reactions of the same type given.
    *
-   * @param universalProfileAddress The address of the Universal Profile whoose number of the same type symbol we will get.
-   * @param symbolNumber The index number of the symbol.
+   * @param universalProfileAddress The address of the Universal Profile whoose number of the same type of reactions we will get.
+   * @param reactionNumber The index number of the reaction.
    */
-  function getNumberOfSymbolsRecieved(address universalProfileAddress, uint symbolNumber) external view returns(uint256) {
-    return symbols[symbolNumber].balanceOf(universalProfileAddress);
+  function getNumberOfSymbolsRecieved(address universalProfileAddress, uint reactionNumber) external view returns(uint256) {
+    return reactions[reactionNumber].balanceOf(universalProfileAddress);
   }
 
   // --- GENERAL METHODS
 
   /**
-   * @notice Award a symbol to a Universal Profile.
+   * @notice Give a reaction to a Universal Profile.
    *
-   * @param universalProfileAddress The address of the Universal Profile that awards the symbol.
-   * @param awardedUniversalProfileAddress The address of the Universal Profile that will recieve the symbol.
-   * @param symbolNumber The index number of the symbol.
+   * @param universalProfileAddress The address of the Universal Profile that gives a reaction.
+   * @param awardedUniversalProfileAddress The address of the Universal Profile that will recieve the reaction.
+   * @param reactionNumber The index number of the reaction.
    */
   function awardSymbol(
     address universalProfileAddress,
     address awardedUniversalProfileAddress,
-    uint symbolNumber
+    uint reactionNumber
   )
     external
-    symbolNumberExists(symbolNumber)
+    reactionNumberExists(reactionNumber)
   {
     _awardSymbol(universalProfileAddress, awardedUniversalProfileAddress, symbolNumber);
   }

@@ -1,0 +1,10 @@
+.emoji {
+  margin: .4rem;
+  font-size: 2rem;
+  opacity: .5;
+}
+
+.emoji:hover {
+  opacity: 1;
+  cursor: pointer;
+}

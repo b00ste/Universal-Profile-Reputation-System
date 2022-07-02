@@ -4,12 +4,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.sol";
+import "@erc725/smart-contracts/contracts/interfaces/IERC725Y.sol";
 import "./ReactionToken.sol";
 
 /**
  * @title UniversalProfileReputationSystem
  * @author B00ste
- * @custom:version 0.3
+ * @custom:version 0.4
  */
 contract UniversalProfileReputationSystem {
 
@@ -17,6 +18,11 @@ contract UniversalProfileReputationSystem {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   // --- ATTRIBUTES
+
+  /**
+   * @notice Definig the interface IERC725Y for using `getData()` method of an Universal Profile.  
+   */
+  IERC725Y universalprofile;
 
   /**
    * @notice Instance of the token, whoose holders can give reactions.
@@ -50,22 +56,10 @@ contract UniversalProfileReputationSystem {
     pinkPill = ILSP7DigitalAsset(pinkPillAddress);
     greenPill = ILSP7DigitalAsset(greenPillAddress);
 
-    //6th reaction awarded back for reacting. Tracks individuals participation.
-    participationReaction = new ReactionToken(
-      5,
-      address(0),
-      pinkPillAddress,
-      greenPillAddress,
-      unicode"🎟",
-      unicode"🎟",
-      msg.sender,
-      true
-    );
-
     // Reaction Token initaited.
     reaction1 = new ReactionToken(
       0,
-      address(participationReaction),
+      address(this),
       pinkPillAddress,
       greenPillAddress,
       unicode"😡",
@@ -75,7 +69,7 @@ contract UniversalProfileReputationSystem {
     );
     reaction2 = new ReactionToken(
       1,
-      address(participationReaction),
+      address(this),
       pinkPillAddress,
       greenPillAddress,
       unicode"👎",
@@ -85,7 +79,7 @@ contract UniversalProfileReputationSystem {
     );
     reaction3 = new ReactionToken(
       2,
-      address(participationReaction),
+      address(this),
       pinkPillAddress,
       greenPillAddress,
       unicode"👍",
@@ -95,7 +89,7 @@ contract UniversalProfileReputationSystem {
     );
     reaction4 = new ReactionToken(
       3,
-      address(participationReaction),
+      address(this),
       pinkPillAddress,
       greenPillAddress,
       unicode"👏",
@@ -105,11 +99,23 @@ contract UniversalProfileReputationSystem {
     );
     reaction5 = new ReactionToken(
       4,
-      address(participationReaction),
+      address(this),
       pinkPillAddress,
       greenPillAddress,
       unicode"💚",
       unicode"💚",
+      msg.sender,
+      true
+    );
+
+    //6th reaction awarded back for reacting. Tracks individuals participation.
+    participationReaction = new ReactionToken(
+      5,
+      address(this),
+      pinkPillAddress,
+      greenPillAddress,
+      unicode"🎟",
+      unicode"🎟",
       msg.sender,
       true
     );
@@ -128,6 +134,39 @@ contract UniversalProfileReputationSystem {
     _;
   }
 
+  /**
+   * @notice Custom method for verifying if `msg.sender` has CALL and STATICCALL rights for the Universal Profile.
+   */
+  function verifyController(address universalProfileAddress) internal view returns(bool) {
+    bytes memory key = bytes.concat(
+      bytes6(keccak256("AddressPermissions")),
+      bytes4(keccak256("Permissions")),
+      bytes2(0),
+      bytes20(msg.sender)
+    );
+    bytes memory res = IERC725Y(universalProfileAddress).getData(bytes32(key));
+
+    uint16 full = uint16(bytes2(bytes.concat(res[30], res[31])));
+
+    if ((full & (1 << 4)) + (full & (1 << 5)) == 48) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  /**
+   * @notice Verify that the msg.sender is the Univerasal Profile address or one of its controller address with the necessary permissions.
+   */
+  modifier msgSenderOwnsUniversalProfile(address universalProfileAddress) {
+    require(
+      msg.sender == universalProfileAddress || verifyController(universalProfileAddress),
+      "The msg.sender doesn't have the necessary rights."
+    );
+    _;
+  }
+
   // --- GETTERS & SETTERS
 
   /**
@@ -138,7 +177,7 @@ contract UniversalProfileReputationSystem {
   }
 
   /**
-   * @notice Increases the number of reactions of the same type given.
+   * @notice Sends a Reaction token to a Universal profile.
    *
    * @param universalProfileAddress The address of the Universal Profile who will give a reaction.
    * @param awardedUniversalProfileAddress The address of the Universal profile that will be given a reaction.
@@ -150,6 +189,19 @@ contract UniversalProfileReputationSystem {
     uint reactionNumber
   ) private {
     reactions[reactionNumber].mint(universalProfileAddress, awardedUniversalProfileAddress, 1, true, "");
+  }
+
+  /**
+   * @notice Sends a participation token to a Universal profile.
+   *
+   * @param universalProfileAddress The address of the Universal Profile who will recieve the Participation Token.
+   * @param awardedUniversalProfileAddress The address of the Universal profile that will give the Participation token.
+   */
+  function awardParticipationToken(
+    address universalProfileAddress,
+    address awardedUniversalProfileAddress
+  ) private {
+    participationReaction.mint(awardedUniversalProfileAddress, universalProfileAddress, 1, true, "");
   }
 
   /**
@@ -178,8 +230,10 @@ contract UniversalProfileReputationSystem {
   )
     external
     reactionNumberExists(reactionNumber)
+    msgSenderOwnsUniversalProfile(universalProfileAddress)
   {
-    _awardSymbol(universalProfileAddress, awardedUniversalProfileAddress, symbolNumber);
+    _awardSymbol(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
+    _awardSymbol(awardedUniversalProfileAddress, universalProfileAddress, 5);
   }
 
 }

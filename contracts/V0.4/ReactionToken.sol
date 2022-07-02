@@ -8,7 +8,7 @@ import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.
 /**
  * @title ReactionToken
  * @author B00ste
- * @custom:version 0.3
+ * @custom:version 0.4
  */
 contract ReactionToken is LSP7DigitalAsset {
 
@@ -30,14 +30,14 @@ contract ReactionToken is LSP7DigitalAsset {
   ILSP7DigitalAsset private greenPill;
 
   /**
-   * @notice Instance of the participationToken.
-   */
-  ReactionToken private participationToken;
-
-  /**
    * @notice Constant address of the multisig.
    */
   address constant MULTISIG = 0x6A0e62776530d9F9B73463F20e34D0f9fe5FEED1;
+
+  /**
+   * @notice The address of the UniversalProfileReputationSystem smart contract.
+   */
+  address private universalProfileReputationSystem;
 
   /**
    * @notice The number of the reaction.
@@ -50,7 +50,6 @@ contract ReactionToken is LSP7DigitalAsset {
    * @notice Creates a new LSP7 token and saves the must hold token instances and the participationToken token instance.
    *
    * @param _reactionNumber Hardcoded number that identifies a reaction. A reaction's index.
-   * @param participationTokenAddress A token of the same tipe as this which is only awarded to those who react to others as a participation token.
    * @param pinkPillAddress The address of the Pink Pill LSP7. This is a must have to react and recieve reactions.
    * @param greenPillAddress The address of the Pink Pill LSP7. This is a must to recieve reactions.
    * @param _name The name of this token.
@@ -60,7 +59,7 @@ contract ReactionToken is LSP7DigitalAsset {
    */
   constructor(
     uint _reactionNumber,
-    address participationTokenAddress,
+    address _universalProfileReputationSystem,
     address pinkPillAddress,
     address greenPillAddress,
     string memory _name,
@@ -70,24 +69,25 @@ contract ReactionToken is LSP7DigitalAsset {
   ) LSP7DigitalAsset(_name, _symbol, _newOwner, _isNFT) {
     pinkPill = LSP7DigitalAsset(pinkPillAddress);
     greenPill = LSP7DigitalAsset(greenPillAddress);
-    participationToken = ReactionToken(participationTokenAddress);
     reactionNumber = _reactionNumber;
+    universalProfileReputationSystem = _universalProfileReputationSystem;
   }
 
   // --- EVENTS
 
-  Event userReactedToWith(address universalProfileAddress, address awardedUniversalProfileAddress, uint symbolNumber);
+  event userReactedToWith(address universalProfileAddress, address awardedUniversalProfileAddress, uint symbolNumber);
 
   // --- MODIFIERS
 
   /**
-   * @notice Verifies that the last awarded symbol timestamp is older than 24h.
+   * @notice Verifies that the last awarded symbol timestamp is older than 24h. The verification is skipped
+   * if the tokenNumber is 5 because that is the participationToken which is awarded whenever you give a reaction.
    * 
    * @param universalProfileAddress The address of the Universal Profile that is checked.
    */
-  modifier symbolGiven24hAgo(address universalProfileAddress) {
+  modifier reactionGiven24hAgo(address universalProfileAddress) {
     require(
-      lastTimeSymbolWasGiven[universalProfileAddress] + 1 days <= block.timestamp,
+      lastTimeReactionWasGiven[universalProfileAddress] + 1 days <= block.timestamp || reactionNumber == 5,
       "Universal Profile has given a symbol less than 1 day ago."
     );
     _;
@@ -133,6 +133,17 @@ contract ReactionToken is LSP7DigitalAsset {
     _;
   }
 
+  /**
+   * @notice Verifing that the `msg.sender` is `universalProfileReputationSystem`
+   */
+  modifier onlyUniversalProfileReputationSystem() {
+    require(
+      msg.sender == universalProfileReputationSystem,
+      "msg.sender isnt Universal Profile Reputation System"
+    );
+    _;
+  }
+
   // --- GETTERS & SETTERS
 
   /**
@@ -171,17 +182,14 @@ contract ReactionToken is LSP7DigitalAsset {
     bool force,
     bytes memory data
   )
-    public
+    external
     ownsPinkPill(universalProfileAddress)
     ownsPinkOrGreenPill(awardedUniversalProfileAddress)
     reactionGiven24hAgo(universalProfileAddress)
+    onlyUniversalProfileReputationSystem()
   {
     _mint(awardedUniversalProfileAddress, amount, force, data);
     _updateLastTime(universalProfileAddress);
-
-    if (reactionNumber !== 5) {
-      participationToken.mint(universalProfileAddress, amount, force, data);
-    }
 
     emit userReactedToWith(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
   }

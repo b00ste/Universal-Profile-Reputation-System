@@ -1,7 +1,6 @@
-import Web3 from 'web3';
-const web3 = new Web3(window.ethereum);
+import "./Connect.css";
 
-const Connect = ({ account, setAccount }:ConnectProps) => {
+const Connect = ({ account, setAccount, web3 }:ConnectProps) => {
 
   const connect = async () => {
     const accountsRequest: string[] = await web3.eth.requestAccounts();  
@@ -21,8 +20,15 @@ const Connect = ({ account, setAccount }:ConnectProps) => {
     <div className='connect'>
     {
       account === ''
-      ? <button className='connect-btn' onClick={() => connect()}>Connect</button>
-      : <button className='connect-btn' onClick={() => disconnect()}>Disconnect</button>
+      ? <div className='connect-btn-container'>
+          <div className='connect-btn-background'/>
+          <div className='connect-btn-form'>
+            <p className='connect-btn-text'>Please Connect with a Universal Profile browser extension. If you didn't install it yet, you can follow instructions on:</p>
+            <a className='connect-btn-link' target="_blank" rel='noreferrer' href='https://docs.lukso.tech/guides/universal-profile/browser-extension/install-browser-extension/'>UP Browser Extension</a>
+            <button className='connect-btn-connect' onClick={() => connect()}>Connect</button>
+          </div>
+        </div>
+      : <button className='connect-btn-disconnect' onClick={() => disconnect()}>Disconnect</button>
     }
     </div>
   );

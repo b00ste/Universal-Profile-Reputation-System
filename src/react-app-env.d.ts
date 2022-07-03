@@ -7,8 +7,24 @@ interface Window {
 interface ConnectProps {
   account: string;
   setAccount: Function;
+  web3: {
+    eth: {
+      requestAccounts: Function;
+    };
+  };
 }
 
 interface GiveReactionProps {
   account: string;
+  contract: {
+    methods: {
+      react: Function;
+      getNumberOfSymbolsRecieved: Function;
+    };
+  };
+  web3: {
+    utils: {
+      isAddress: Function;
+    };
+  }
 }

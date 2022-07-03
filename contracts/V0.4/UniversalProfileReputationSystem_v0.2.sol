@@ -183,7 +183,7 @@ contract UniversalProfileReputationSystem {
    * @param awardedUniversalProfileAddress The address of the Universal profile that will be given a reaction.
    * @param reactionNumber The index number of the reaction.
    */
-  function _awardSymbol(
+  function _giveReaction(
     address universalProfileAddress,
     address awardedUniversalProfileAddress,
     uint reactionNumber
@@ -197,7 +197,7 @@ contract UniversalProfileReputationSystem {
    * @param universalProfileAddress The address of the Universal Profile who will recieve the Participation Token.
    * @param awardedUniversalProfileAddress The address of the Universal profile that will give the Participation token.
    */
-  function awardParticipationToken(
+  function _awardParticipationToken(
     address universalProfileAddress,
     address awardedUniversalProfileAddress
   ) private {
@@ -223,7 +223,7 @@ contract UniversalProfileReputationSystem {
    * @param awardedUniversalProfileAddress The address of the Universal Profile that will recieve the reaction.
    * @param reactionNumber The index number of the reaction.
    */
-  function awardSymbol(
+  function react(
     address universalProfileAddress,
     address awardedUniversalProfileAddress,
     uint reactionNumber
@@ -232,8 +232,8 @@ contract UniversalProfileReputationSystem {
     reactionNumberExists(reactionNumber)
     msgSenderOwnsUniversalProfile(universalProfileAddress)
   {
-    _awardSymbol(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
-    _awardSymbol(awardedUniversalProfileAddress, universalProfileAddress, 5);
+    _giveReaction(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
+    _awardParticipationToken(awardedUniversalProfileAddress, universalProfileAddress);
   }
 
 }

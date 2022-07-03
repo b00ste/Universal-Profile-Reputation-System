@@ -7,7 +7,7 @@ import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/LSP7DigitalAsset.s
 contract PlaceholderLSP7 is LSP7DigitalAsset {
 
   constructor(string memory _name, string memory _symbol) LSP7DigitalAsset(_name, _symbol, msg.sender, true) {
-
+    _mint(msg.sender, 100, true, "0x00");
   }
 
 }

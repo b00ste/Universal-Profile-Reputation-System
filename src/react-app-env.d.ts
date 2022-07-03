@@ -26,5 +26,9 @@ interface GiveReactionProps {
     utils: {
       isAddress: Function;
     };
-  }
+  };
+}
+
+interface ProfileParams {
+  account: string;
 }

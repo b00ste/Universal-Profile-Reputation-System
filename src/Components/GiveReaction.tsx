@@ -45,15 +45,17 @@ const GiveReaction = ({ account, contract, web3 }:GiveReactionProps) => {
     }
     const res = await contract.methods.getNumberOfSymbolsRecieved(reciever, emojiSelected).call();
     console.log(res);
-
+    alert(res);
   }
 
   return (
-    <div className='give-reaction'>
-      <div className='give-reaction-form'>
-        <input onChange={(e) => saveAddress(e.target.value)} type='text' className='give-reaction-input' placeholder='Universal Profile Address' />
-        <button className='give-reaction-btn' onClick={() => sendReaction()}>React</button>
-        <button className='get-reaction-btn' onClick={() => getReactions()}>See reactions</button>
+    <div className='reaction'>
+      <div className='reaction-form'>
+        <input onChange={(e) => saveAddress(e.target.value)} type='text' className='reaction-input' placeholder='Universal Profile Address' />
+        <div>
+          <button className='reaction-btn give' onClick={() => sendReaction()}>react</button>
+          <button className='reaction-btn get' onClick={() => getReactions()}>see reactions</button>
+        </div>
       </div>
       <div className='emoji-list' style={{ display: 'flex', flexDirection: 'row' }}>
         <p className='emoji' style={emojiSelected === 0 ? { opacity: '1' } : {} } onClick={() => selectEmoji(0)} >😡</p>

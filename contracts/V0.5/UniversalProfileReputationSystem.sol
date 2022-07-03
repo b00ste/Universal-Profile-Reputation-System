@@ -10,7 +10,7 @@ import "./ReactionToken.sol";
 /**
  * @title UniversalProfileReputationSystem
  * @author B00ste
- * @custom:version 0.4
+ * @custom:version 0.5
  */
 contract UniversalProfileReputationSystem {
 
@@ -18,11 +18,6 @@ contract UniversalProfileReputationSystem {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   // --- ATTRIBUTES
-
-  /**
-   * @notice Definig the interface IERC725Y for using `getData()` method of an Universal Profile.  
-   */
-  IERC725Y universalprofile;
 
   /**
    * @notice Instance of the token, whoose holders can give reactions.
@@ -45,9 +40,9 @@ contract UniversalProfileReputationSystem {
   ReactionToken participationReaction;
 
   /**
-   * @notice This array holds the 5 reaction instances that can be given to an Universal Profile.
+   * @notice This array holds the 6 reaction instances that can be given to an Universal Profile.
    */
-  ReactionToken[5] private reactions = [reaction1, reaction2, reaction3, reaction4, reaction5];
+  ReactionToken[6] private reactions;
 
   /**
    * @notice The constructor saves a instance of the token at a certain address and creates 5 reaction tokens that will be awarded further.
@@ -119,6 +114,7 @@ contract UniversalProfileReputationSystem {
       msg.sender,
       true
     );
+    reactions = [reaction1, reaction2, reaction3, reaction4, reaction5, participationReaction];
   }
 
   // --- MODIFIERS
@@ -188,7 +184,13 @@ contract UniversalProfileReputationSystem {
     address awardedUniversalProfileAddress,
     uint reactionNumber
   ) private {
-    reactions[reactionNumber].mint(universalProfileAddress, awardedUniversalProfileAddress, 1, true, "");
+    bytes memory data = bytes.concat(
+      bytes4(keccak256('ReactionToken:')),
+      bytes2(abi.encodePacked(reactionNumber)),
+      bytes20(awardedUniversalProfileAddress),
+      bytes20(universalProfileAddress)
+    );
+    reactions[reactionNumber].mint(universalProfileAddress, awardedUniversalProfileAddress, 1, false, data);
   }
 
   /**
@@ -201,7 +203,13 @@ contract UniversalProfileReputationSystem {
     address universalProfileAddress,
     address awardedUniversalProfileAddress
   ) private {
-    participationReaction.mint(awardedUniversalProfileAddress, universalProfileAddress, 1, true, "");
+    bytes memory data = bytes.concat(
+      bytes4(keccak256('ParticipationToken:')),
+      bytes2(abi.encodePacked(uint256(5))),
+      bytes20(awardedUniversalProfileAddress),
+      bytes20(universalProfileAddress)
+    );
+    participationReaction.mint(awardedUniversalProfileAddress, universalProfileAddress, 1, false, data);
   }
 
   /**
@@ -210,8 +218,17 @@ contract UniversalProfileReputationSystem {
    * @param universalProfileAddress The address of the Universal Profile whoose number of the same type of reactions we will get.
    * @param reactionNumber The index number of the reaction.
    */
-  function getNumberOfSymbolsRecieved(address universalProfileAddress, uint reactionNumber) external view returns(uint256) {
+  function getNumberOfReactionsRecieved(address universalProfileAddress, uint reactionNumber) external view returns(uint256) {
     return reactions[reactionNumber].balanceOf(universalProfileAddress);
+  }
+
+  /**
+   * @notice Getter for the number of participation tokens awarded.
+   *
+   * @param universalProfileAddress The address of the Universal Profile whoose number of the same type of reactions we will get.
+   */
+  function getNumberOfParticipationTokens(address universalProfileAddress) external view returns(uint256) {
+    return participationReaction.balanceOf(universalProfileAddress);
   }
 
   // --- GENERAL METHODS

@@ -21,7 +21,7 @@
 .connect-btn-form {
   width: 20rem;
   height: 25rem;
-  background-color: white;
+  background-color: #C179B9;
   z-index: 2;
   border-radius: .5rem;
   display: flex;
@@ -39,8 +39,28 @@
   margin: .5rem 0 1rem 0; 
 }
 
-.connect-btn-disconnect {
+.connect-btn-link:visited {
+  text-decoration: none;
+  color: black;
+}
+
+.disconnect {
   position: absolute;
   top: 1rem;
   left: 1rem;
+}
+
+.connect-btn {
+  width: 8rem;
+  height: 2rem;
+  border: 0;
+  border-radius: .3rem;
+  text-align: center;
+  font-weight: bold;
+  background-color: #EEB4B3;
+}
+
+.connect-btn:hover {
+ opacity: .8;
+ cursor: pointer;
 }

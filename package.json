@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@erc725/erc725.js": "^0.14.2",
     "@erc725/smart-contracts": "^3.1.1",
     "@lukso/lsp-smart-contracts": "^0.6.1",
     "@openzeppelin/contracts": "^4.7.0",
@@ -13,6 +14,7 @@
     "@types/node": "^16.11.42",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "isomorphic-fetch": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "4.0.3",

@@ -21,21 +21,17 @@
         "internalType": "address",
         "name": "universalProfileAddress",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "awardedUniversalProfileAddress",
-        "type": "address"
-      },
+      }
+    ],
+    "name": "getNumberOfParticipationTokens",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "reactionNumber",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "awardSymbol",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -51,7 +47,7 @@
         "type": "uint256"
       }
     ],
-    "name": "getNumberOfSymbolsRecieved",
+    "name": "getNumberOfReactionsRecieved",
     "outputs": [
       {
         "internalType": "uint256",
@@ -73,6 +69,29 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "universalProfileAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "awardedUniversalProfileAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reactionNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "react",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

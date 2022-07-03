@@ -8,7 +8,7 @@ import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.
 /**
  * @title ReactionToken
  * @author B00ste
- * @custom:version 0.4
+ * @custom:version 0.5
  */
 contract ReactionToken is LSP7DigitalAsset {
 
@@ -125,7 +125,7 @@ contract ReactionToken is LSP7DigitalAsset {
    * 
    * @param _address The address that is checked.
    */
-  modifier senderIsMultisig(address _address) {
+  modifier onlyMultisig(address _address) {
     require(
       _address == MULTISIG,
       "msg.sender is not the multisig address."
@@ -139,7 +139,7 @@ contract ReactionToken is LSP7DigitalAsset {
   modifier onlyUniversalProfileReputationSystem() {
     require(
       msg.sender == universalProfileReputationSystem,
-      "msg.sender isnt Universal Profile Reputation System"
+      "msg.sender is not the Universal Profile Reputation System address"
     );
     _;
   }
@@ -205,7 +205,7 @@ contract ReactionToken is LSP7DigitalAsset {
         uint256 amount,
         bool force,
         bytes memory data
-  ) public virtual override senderIsMultisig(msg.sender) {
+  ) public virtual override onlyMultisig(msg.sender) {
     _transfer(from, to, amount, force, data);
   }
 

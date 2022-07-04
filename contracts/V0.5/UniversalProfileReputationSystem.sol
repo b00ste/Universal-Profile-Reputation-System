@@ -10,7 +10,7 @@ import "./ReactionToken.sol";
 /**
  * @title UniversalProfileReputationSystem
  * @author B00ste
- * @custom:version 0.5
+ * @custom:version 0.6
  */
 contract UniversalProfileReputationSystem {
 
@@ -18,6 +18,11 @@ contract UniversalProfileReputationSystem {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   // --- ATTRIBUTES
+
+  /**
+   * @notice This attribute stores the timestamp of the last given reaction.
+   */
+  mapping (address => uint) private lastTimeReactionWasGiven;
 
   /**
    * @notice Instance of the token, whoose holders can give reactions.
@@ -120,6 +125,20 @@ contract UniversalProfileReputationSystem {
   // --- MODIFIERS
 
   /**
+   * @notice Verifies that the last awarded symbol timestamp is older than 24h. The verification is skipped
+   * if the tokenNumber is 5 because that is the participationToken which is awarded whenever you give a reaction.
+   * 
+   * @param universalProfileAddress The address of the Universal Profile that is checked.
+   */
+  modifier reactionGiven24hAgo(address universalProfileAddress) {
+    require(
+      lastTimeReactionWasGiven[universalProfileAddress] + 1 days <= block.timestamp,
+      "Universal Profile has given a symbol less than 1 day ago."
+    );
+    _;
+  }
+
+  /**
    * @notice Verifies that the given number is 0, 1, 2, 3 or 4.
    */
   modifier reactionNumberExists(uint number) {
@@ -164,6 +183,24 @@ contract UniversalProfileReputationSystem {
   }
 
   // --- GETTERS & SETTERS
+
+  /**
+   * @notice Update the latest given reaction timestamp.
+   *
+   * @param universalProfileAddress The address of the Universal Profile whoose last given reaction timestamp is updated.
+   */
+  function _updateLastTime(address universalProfileAddress) private {
+    lastTimeReactionWasGiven[universalProfileAddress] = block.timestamp;
+  }
+
+  /**
+   * @notice Getter of the last given reaction timestamp.
+   *
+   * @param universalProfileAddress The address of the Universal Profile whoose last given reaction timestam we are getting.
+   */
+  function getLastTime(address universalProfileAddress) external view returns(uint) {
+    return lastTimeReactionWasGiven[universalProfileAddress];
+  }
 
   /**
    * @notice Getter for the array of reactions.
@@ -248,9 +285,11 @@ contract UniversalProfileReputationSystem {
     external
     reactionNumberExists(reactionNumber)
     msgSenderOwnsUniversalProfile(universalProfileAddress)
+    reactionGiven24hAgo(universalProfileAddress)
   {
     _giveReaction(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
     _awardParticipationToken(awardedUniversalProfileAddress, universalProfileAddress);
+    _updateLastTime(universalProfileAddress);
   }
 
 }

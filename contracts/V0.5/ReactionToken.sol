@@ -8,16 +8,11 @@ import "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.
 /**
  * @title ReactionToken
  * @author B00ste
- * @custom:version 0.5
+ * @custom:version 0.6
  */
 contract ReactionToken is LSP7DigitalAsset {
 
   // --- ATTRIBUTES
-
-  /**
-   * @notice This attribute stores the timestamp of the last given reaction.
-   */
-  mapping (address => uint) private lastTimeReactionWasGiven;
 
   /**
    * @notice Instance of the token, whoose holders can give rections and recieve reactions.
@@ -80,20 +75,6 @@ contract ReactionToken is LSP7DigitalAsset {
   // --- MODIFIERS
 
   /**
-   * @notice Verifies that the last awarded symbol timestamp is older than 24h. The verification is skipped
-   * if the tokenNumber is 5 because that is the participationToken which is awarded whenever you give a reaction.
-   * 
-   * @param universalProfileAddress The address of the Universal Profile that is checked.
-   */
-  modifier reactionGiven24hAgo(address universalProfileAddress) {
-    require(
-      lastTimeReactionWasGiven[universalProfileAddress] + 1 days <= block.timestamp || reactionNumber == 5,
-      "Universal Profile has given a symbol less than 1 day ago."
-    );
-    _;
-  }
-
-  /**
    * @notice Verifies that the address owns the Pink Pill.
    * 
    * @param universalProfileAddress The address of the Universal Profile that is checked.
@@ -144,26 +125,6 @@ contract ReactionToken is LSP7DigitalAsset {
     _;
   }
 
-  // --- GETTERS & SETTERS
-
-  /**
-   * @notice Update the latest given reaction timestamp.
-   *
-   * @param universalProfileAddress The address of the Universal Profile whoose last given reaction timestamp is updated.
-   */
-  function _updateLastTime(address universalProfileAddress) private {
-    lastTimeReactionWasGiven[universalProfileAddress] = block.timestamp;
-  }
-
-  /**
-   * @notice Getter of the last given reaction timestamp.
-   *
-   * @param universalProfileAddress The address of the Universal Profile whoose last given reaction timestam we are getting.
-   */
-  function getLastTime(address universalProfileAddress) external view returns(uint) {
-    return lastTimeReactionWasGiven[universalProfileAddress];
-  }
-
   // --- GENERAL METHODS
 
   /**
@@ -185,11 +146,9 @@ contract ReactionToken is LSP7DigitalAsset {
     external
     ownsPinkPill(universalProfileAddress)
     ownsPinkOrGreenPill(awardedUniversalProfileAddress)
-    reactionGiven24hAgo(universalProfileAddress)
     onlyUniversalProfileReputationSystem()
   {
     _mint(awardedUniversalProfileAddress, amount, force, data);
-    _updateLastTime(universalProfileAddress);
 
     emit userReactedToWith(universalProfileAddress, awardedUniversalProfileAddress, reactionNumber);
   }

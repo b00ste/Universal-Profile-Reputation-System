@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './App.css';
+
+import { users } from './Components/Users';
 
 import Connect from './Components/Connect';
 import Profile from './Components/Profile';
-import GiveReaction from './Components/GiveReaction';
+//import GiveReaction from './Components/GiveReaction';
 import SendPills from './Components/SendPills';
 
 
@@ -33,9 +35,29 @@ const App = () => {
       {
         account !== ''
           ? <>
-              <Profile account={account} contract={contract} />
-              <GiveReaction account={account} contract={contract} web3={web3} />
+              <>
+              {
+                users.map((element) => {
+                  if(element.address === account) {
+                    return <Profile connectedAccount={account} selectedAccount={element.address} contract={contract} web3={web3} />;
+                  }
+                  return <></>;
+                })
+              }
+              </>
+
+              <>
+              {
+                users.map((element) => {
+                  if(element.address !== account) {
+                    return <Profile connectedAccount={account} selectedAccount={element.address} contract={contract} web3={web3} key={element.id} />;
+                  }
+                  return <></>;
+                })
+              }
+              </>
               <SendPills account={account} pinkPill={pinkPill} greenPill={greenPill} pills={pills} setPills={setPills} />
+              {/*<GiveReaction account={account} contract={contract} web3={web3} />*/}
             </>
           : <></>
       }

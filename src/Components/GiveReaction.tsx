@@ -43,7 +43,7 @@ const GiveReaction = ({ account, contract, web3 }:GiveReactionProps) => {
       alert("Please type a valid address.");
       return 0;
     }
-    const res = await contract.methods.getNumberOfSymbolsRecieved(reciever, emojiSelected).call();
+    const res = await contract.methods.getNumberOfReactionsRecieved(reciever, emojiSelected).call();
     console.log(res);
     alert(res); 
   }
@@ -57,7 +57,7 @@ const GiveReaction = ({ account, contract, web3 }:GiveReactionProps) => {
           <button className='reaction-btn get' onClick={() => getReactions()}>see reactions</button>
         </div>
       </div>
-      <div className='emoji-list' style={{ display: 'flex', flexDirection: 'row' }}>
+      <div className='emoji-list' >
         <p className='emoji' style={emojiSelected === 0 ? { opacity: '1' } : {} } onClick={() => selectEmoji(0)} >😡</p>
         <p className='emoji' style={emojiSelected === 1 ? { opacity: '1' } : {} } onClick={() => selectEmoji(1)} >👎</p>
         <p className='emoji' style={emojiSelected === 2 ? { opacity: '1' } : {} } onClick={() => selectEmoji(2)} >👍</p>

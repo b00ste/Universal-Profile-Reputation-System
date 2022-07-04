@@ -1,22 +1,11 @@
 import { useState, useEffect } from "react";
 import "./Profile.css";
 
-// Import and Network Setup
-const Web3 = require('web3');
-const { ERC725 } = require('@erc725/erc725.js');
-require('isomorphic-fetch');
+import { users } from "./Users";
 
-// Our static variables
-const RPC_ENDPOINT = 'https://rpc.l16.lukso.network';
-const IPFS_GATEWAY = 'https://2eff.lukso.dev/ipfs/';
+const Profile = ({ connectedAccount, selectedAccount, contract, web3 }:ProfileParams) => {
 
-// Parameters for ERC725 Instance
-const erc725schema = require('@erc725/erc725.js/schemas/LSP3UniversalProfileMetadata.json');
-const provider = new Web3.providers.HttpProvider(RPC_ENDPOINT);
-const config = { ipfsGateway: IPFS_GATEWAY };
-
-const Profile = ({ account, contract }:ProfileParams) => {
-
+  const [emojiSelected, setEmojiSelected] = useState(-1);
   const [reactions, setReactions] = useState({
     updated: false,
     0: 0,
@@ -26,34 +15,33 @@ const Profile = ({ account, contract }:ProfileParams) => {
     4: 0
   })
 
-  useEffect(() => {
-        
-    async function fetchProfile(address: string) {
-      try {
-        const profile = new ERC725(erc725schema, address, provider, config);
-        return await profile.fetchData();
-      } catch (error) {
-          return console.log('This is not an ERC725 Contract');
-      }
+  const selectEmoji = (index:number) => {
+    if(index === emojiSelected) {
+      setEmojiSelected(-1);
     }
+    else if (index >= 0 && index <= 4) {
+      setEmojiSelected(index);
+    }
+    else {
+      return 0;
+    }
+  }
 
-    async function fetchProfileData(address: string) {
-      try {
-        const profile = new ERC725(erc725schema, address, provider, config);
-        return await profile.fetchData('LSP3Profile');
-      } catch (error) {
-          return console.log('This is not an ERC725 Contract');
-      }
-    }
+  const sendReaction = async () => {
+    const res = await contract.methods.react(connectedAccount, selectedAccount, emojiSelected).send({ from: connectedAccount });
+    console.log(res);
+  }
+
+  useEffect(() => {
 
     const getReactions = async () => {
       const newReactions = {
         updated: true,
-        0: await contract.methods.getNumberOfReactionsRecieved(account, 0).call({ from: account }),
-        1: await contract.methods.getNumberOfReactionsRecieved(account, 1).call({ from: account }),
-        2: await contract.methods.getNumberOfReactionsRecieved(account, 2).call({ from: account }),
-        3: await contract.methods.getNumberOfReactionsRecieved(account, 3).call({ from: account }),
-        4: await contract.methods.getNumberOfReactionsRecieved(account, 4).call({ from: account })
+        0: await contract.methods.getNumberOfReactionsRecieved(selectedAccount, 0).call({ from: selectedAccount }),
+        1: await contract.methods.getNumberOfReactionsRecieved(selectedAccount, 1).call({ from: selectedAccount }),
+        2: await contract.methods.getNumberOfReactionsRecieved(selectedAccount, 2).call({ from: selectedAccount }),
+        3: await contract.methods.getNumberOfReactionsRecieved(selectedAccount, 3).call({ from: selectedAccount }),
+        4: await contract.methods.getNumberOfReactionsRecieved(selectedAccount, 4).call({ from: selectedAccount })
       };
       setReactions(newReactions);
     }
@@ -62,29 +50,65 @@ const Profile = ({ account, contract }:ProfileParams) => {
       getReactions();
     }
 
-    // Step 1
-    /*fetchProfile(account).then((profileData) =>
-      console.log(JSON.stringify(profileData, undefined, 2)),
-    );
-    
-    // Step 2
-    fetchProfileData(account).then((profileData) =>
-      console.log(JSON.stringify(profileData, undefined, 2)),
-    );*/
-
   });
 
   return (
     <div className='profile'>
-      <p className='profile-name' onClick={() => window.open(('https://explorer.execution.l16.lukso.network/address/' + account + '/'), '_blank', 'noopener,noreferrer')}>profile-name</p>
+      <p
+        className='profile-name'
+        onClick={() => window.open(('https://explorer.execution.l16.lukso.network/address/' + connectedAccount + '/'), '_blank', 'noopener,noreferrer')}
+      >
+        {
+          users.map((element) => {
+            if (element.address === selectedAccount) {
+              return element.name;
+            }
+            return '';
+          })
+        }
+      </p>
+      {
+        selectedAccount !== connectedAccount && emojiSelected !== -1
+        ? <>
+            <p className='react-btn' onClick={() => sendReaction()}>react</p>
+            <p className='back-btn' onClick={() => setEmojiSelected(-1)}>back</p>
+          </>
+        : <></>
+      }
 
-      <div className='profile-emoji-list'>
-        <p className='profile-emoji'>{reactions[0] + 'x'} 😡</p>
-        <p className='profile-emoji'>{reactions[1] + 'x'} 👎</p>
-        <p className='profile-emoji'>{reactions[2] + 'x'} 👍</p>
-        <p className='profile-emoji'>{reactions[3] + 'x'} 👏</p>
-        <p className='profile-emoji'>{reactions[4] + 'x'} 💚</p>
-      </div>
+        {
+          connectedAccount === selectedAccount
+          ? <div className='profile-emoji-list'>
+              <p className='profile-emoji'>{reactions[0] + 'x'} 😡</p>
+              <p className='profile-emoji'>{reactions[1] + 'x'} 👎</p>
+              <p className='profile-emoji'>{reactions[2] + 'x'} 👍</p>
+              <p className='profile-emoji'>{reactions[3] + 'x'} 👏</p>
+              <p className='profile-emoji'>{reactions[4] + 'x'} 💚</p>
+            </div>
+          : <div className='profile-emoji-list'>
+              <p className='profile-emoji' >
+                {reactions[0] + 'x'}
+                <span className='emoji' style={emojiSelected === 0 ? { opacity: '1' } : {} } onClick={() => selectEmoji(0)}>😡</span>
+              </p>
+              <p className='profile-emoji' >
+                {reactions[1] + 'x'}
+                <span className='emoji' style={emojiSelected === 1 ? { opacity: '1' } : {} } onClick={() => selectEmoji(1)}>👎</span>
+              </p>
+              <p className='profile-emoji' >
+                {reactions[2] + 'x'}
+                <span className='emoji' style={emojiSelected === 2 ? { opacity: '1' } : {} } onClick={() => selectEmoji(2)}>👍</span>
+              </p>
+              <p className='profile-emoji' >
+                {reactions[3] + 'x'}
+                <span className='emoji' style={emojiSelected === 3 ? { opacity: '1' } : {} } onClick={() => selectEmoji(3)}>👏</span>
+              </p>
+              <p className='profile-emoji' >
+                {reactions[4] + 'x'}
+                <span className='emoji' style={emojiSelected === 4 ? { opacity: '1' } : {} } onClick={() => selectEmoji(4)}>💚</span>
+              </p>
+            </div>
+        }
+      
     </div>
   );
 }

@@ -19,7 +19,7 @@ interface GiveReactionProps {
   contract: {
     methods: {
       react: Function;
-      getNumberOfSymbolsRecieved: Function;
+      getNumberOfReactionsRecieved: Function;
     };
   };
   web3: {
@@ -51,10 +51,17 @@ interface SendPillsProps {
 }
 
 interface ProfileParams {
-  account: string;
+  connectedAccount: string;
+  selectedAccount: string;
   contract: {
     methods: {
+      react: Function;
       getNumberOfReactionsRecieved: Function;
+    };
+  };
+  web3: {
+    utils: {
+      isAddress: Function;
     };
   };
 }

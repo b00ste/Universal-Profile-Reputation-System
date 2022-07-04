@@ -5,6 +5,7 @@
   background-color: rgba(0, 0, 0, .6);
   border-radius: 1rem;
 
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,4 +40,39 @@
   color: white;
   margin: .4rem;
   font-size: 2rem;
+}
+
+.emoji {
+  opacity: .5;
+}
+
+.emoji:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.react-btn, .back-btn {
+  position: absolute;
+  top: .5rem;
+  color: pink;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.react-btn {
+  right: 1.5rem;
+}
+
+.react-btn:hover {
+  opacity: .8;
+  cursor: pointer;
+}
+
+.back-btn {
+  left: 1.5rem;
+}
+
+.back-btn:hover {
+  opacity: .8;
+  cursor: pointer;
 }

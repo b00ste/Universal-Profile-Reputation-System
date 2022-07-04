@@ -5,4 +5,38 @@
   background-color: rgba(0, 0, 0, .6);
   border-radius: 1rem;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-name {
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.profile-name:hover {
+  opacity: .8;
+  cursor: pointer;
+}
+
+.profile-emoji-list {
+  background-color: #2F242C;
+  width: 19rem;
+  height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: .4rem;
+  margin: 1rem 0 0 0;
+}
+
+.profile-emoji {
+  text-align: center;
+  color: white;
+  margin: .4rem;
+  font-size: 2rem;
 }

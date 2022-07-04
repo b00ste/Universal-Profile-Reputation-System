@@ -1,0 +1,82 @@
+.send-pills {
+  margin: .5rem;
+  width: 24rem;
+  height: 17rem;
+  background-color: rgba(0, 0, 0, .6);
+  border-radius: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.owned-pink-pills, .owned-green-pills {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: .4rem;
+}
+
+.pink-pill, .green-pill {
+  width: 2rem;
+  height: auto;
+}
+
+.owned-pink-pills {
+  color: pink;
+}
+
+.pink-pill {
+  fill: pink;
+}
+
+.owned-green-pills {
+  color: green;
+}
+
+.green-pill {
+  fill: green;
+}
+
+.green-pill-form, .pink-pill-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.address-input, .number-of-pills-input, .send-pills-btn {
+  margin: .5rem .5rem .5rem .5rem;
+  border: 0;
+  border-radius: .3rem;
+  text-align: center;
+  font-weight: bold;
+  background-color: #EEB4B3;
+}
+
+.address-input:focus, .number-of-pills-input:focus {
+  outline: none;
+}
+
+.send-pills-btn:hover {
+ opacity: .8;
+ cursor: pointer;
+}
+
+.address-input, .number-of-pills-input {
+  height: 2.4rem;
+  text-align: center;
+}
+
+.address-input {
+  width: 18.5rem;
+}
+
+.number-of-pills-input {
+  width: 4rem;
+}
+
+.send-pills-btn {
+  height: 2rem;
+  width: 4rem;
+}

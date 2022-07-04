@@ -45,7 +45,7 @@ const GiveReaction = ({ account, contract, web3 }:GiveReactionProps) => {
     }
     const res = await contract.methods.getNumberOfSymbolsRecieved(reciever, emojiSelected).call();
     console.log(res);
-    alert(res);
+    alert(res); 
   }
 
   return (

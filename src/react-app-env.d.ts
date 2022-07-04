@@ -29,6 +29,32 @@ interface GiveReactionProps {
   };
 }
 
+interface SendPillsProps {
+  account: Object;
+  pinkPill: {
+    methods: {
+      transfer: Function;
+      balanceOf: Function;
+    };
+  };
+  greenPill: {
+    methods: {
+      transfer: Function;
+      balanceOf: Function;
+    };
+  };
+  pills: {
+    pink: number;
+    green: number;
+  };
+  setPills: Function;
+}
+
 interface ProfileParams {
   account: string;
+  contract: {
+    methods: {
+      getNumberOfReactionsRecieved: Function;
+    };
+  };
 }

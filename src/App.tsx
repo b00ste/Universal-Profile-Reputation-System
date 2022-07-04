@@ -12,7 +12,7 @@ import SendPills from './Components/SendPills';
 import Web3 from 'web3';
 const web3 = new Web3(window.ethereum);
 const CONTRACT_ABI = require('./Components/CONTRACT_ABI.json');
-const CONTRACT_ADDRESS = "0x4Edbbbdd666D40b04AEf59014bf19515117cA546";
+const CONTRACT_ADDRESS = "0xB0eF5BB237450bD96A66Ce13B5E5b2A4cD5713c5";
 const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
 const PILL_ABI = require('./Components/PILL_ABI.json');

@@ -1,4 +1,3 @@
-import { log } from "console";
 import { useState, useEffect } from "react";
 import "./Profile.css";
 
@@ -18,7 +17,14 @@ const config = { ipfsGateway: IPFS_GATEWAY };
 
 const Profile = ({ account, contract }:ProfileParams) => {
 
-  const [reactions, setReactions] = useState([-1, -1, -1, -1, -1])
+  const [reactions, setReactions] = useState({
+    updated: false,
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0
+  })
 
   useEffect(() => {
         
@@ -41,16 +47,21 @@ const Profile = ({ account, contract }:ProfileParams) => {
     }
 
     const getReactions = async () => {
-      for (var i = 0; i < 5; i++) {
-        const reaction = await contract.methods.getNumberOfReactionsRecieved(account, i).call({ from: account });
-        reactions[i] = reaction;
-      }
+      const newReactions = {
+        updated: true,
+        0: await contract.methods.getNumberOfReactionsRecieved(account, 0).call({ from: account }),
+        1: await contract.methods.getNumberOfReactionsRecieved(account, 1).call({ from: account }),
+        2: await contract.methods.getNumberOfReactionsRecieved(account, 2).call({ from: account }),
+        3: await contract.methods.getNumberOfReactionsRecieved(account, 3).call({ from: account }),
+        4: await contract.methods.getNumberOfReactionsRecieved(account, 4).call({ from: account })
+      };
+      setReactions(newReactions);
     }
 
-    if (reactions[0] === -1 || reactions[1] === -1 || reactions[2] === -1 || reactions[3] === -1 || reactions[4] === -1) {
+    if (!reactions.updated) {
       getReactions();
     }
-    
+
     // Step 1
     /*fetchProfile(account).then((profileData) =>
       console.log(JSON.stringify(profileData, undefined, 2)),
@@ -68,11 +79,11 @@ const Profile = ({ account, contract }:ProfileParams) => {
       <p className='profile-name' onClick={() => window.open(('https://explorer.execution.l16.lukso.network/address/' + account + '/'), '_blank', 'noopener,noreferrer')}>profile-name</p>
 
       <div className='profile-emoji-list'>
-        <p className='profile-emoji'>{reactions[0] !== -1 ? reactions[0] + 'x' : '0x'} 😡</p>
-        <p className='profile-emoji'>{reactions[1] !== -1 ? reactions[1] + 'x' : '0x'} 👎</p>
-        <p className='profile-emoji'>{reactions[2] !== -1 ? reactions[2] + 'x' : '0x'} 👍</p>
-        <p className='profile-emoji'>{reactions[3] !== -1 ? reactions[3] + 'x' : '0x'} 👏</p>
-        <p className='profile-emoji'>{reactions[4] !== -1 ? reactions[4] + 'x' : '0x'} 💚</p>
+        <p className='profile-emoji'>{reactions[0] + 'x'} 😡</p>
+        <p className='profile-emoji'>{reactions[1] + 'x'} 👎</p>
+        <p className='profile-emoji'>{reactions[2] + 'x'} 👍</p>
+        <p className='profile-emoji'>{reactions[3] + 'x'} 👏</p>
+        <p className='profile-emoji'>{reactions[4] + 'x'} 💚</p>
       </div>
     </div>
   );

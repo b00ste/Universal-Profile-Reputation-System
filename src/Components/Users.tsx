@@ -18,6 +18,21 @@ export const users = [
     name: 'JordyDutch',
     address: '0x69e21698D00737D4b5f4a5a6078964548fcd6701',
     id: 4
+  },
+  {
+    name: 'Melozi ',
+    address: '0x40257d1017d7Bb595e8086e97890c6c129e47979',
+    id: 5
+  },
+  {
+    name: 'Xela',
+    address: '0x3f5698e824EAb5475e067550616b6da40F887dbc
+    id: 6
+  },
+  {
+    name: 'Rob',
+    address: '0xaa12f9a717D5E85374Fc6CDcCAFB5e9CBaA6118d',
+    id: 7
   }
 ]
 

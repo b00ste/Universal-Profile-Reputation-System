@@ -7,15 +7,6 @@ const Connect = ({ account, setAccount, web3 }:ConnectProps) => {
     setAccount(accountsRequest[0]);
   }
 
-  const disconnect = () => {
-    setAccount('');
-    window.location.reload();
-  }
-
-  /*window.ethereum.on('accountsChanged', function (accounts:string) {
-    setAccount(account[0]);
-  });*/
-
   return (
     <>
     {
@@ -30,7 +21,7 @@ const Connect = ({ account, setAccount, web3 }:ConnectProps) => {
             <button className='connect-btn connect' onClick={() => connect()}>connect</button>
           </div>
         </div>
-      : <button className='connect-btn disconnect' onClick={() => disconnect()}>disconnect</button>
+      : <></>
     }
     </>
   );

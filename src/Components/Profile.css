@@ -51,9 +51,9 @@
   cursor: pointer;
 }
 
-.react-btn, .back-btn {
+.react-btn, .back-btn, .disconnect-btn {
   position: absolute;
-  top: .5rem;
+  top: 0rem;
   color: pink;
   font-size: 1.3rem;
   font-weight: bold;
@@ -73,6 +73,15 @@
 }
 
 .back-btn:hover {
+  opacity: .8;
+  cursor: pointer;
+}
+
+.disconnect-btn {
+  left: 1.5rem;
+}
+
+.disconnect-btn:hover {
   opacity: .8;
   cursor: pointer;
 }

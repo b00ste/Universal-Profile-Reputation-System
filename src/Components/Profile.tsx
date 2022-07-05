@@ -32,6 +32,10 @@ const Profile = ({ connectedAccount, selectedAccount, contract, web3 }:ProfilePa
     console.log(res);
   }
 
+  const disconnect = () => {
+    window.location.reload();
+  }
+
   useEffect(() => {
 
     const getReactions = async () => {
@@ -67,6 +71,11 @@ const Profile = ({ connectedAccount, selectedAccount, contract, web3 }:ProfilePa
           })
         }
       </p>
+      {
+        selectedAccount === connectedAccount
+        ? <p className='disconnect-btn' onClick={() => disconnect()}>disconnect</p>
+        : <></>
+      }
       {
         selectedAccount !== connectedAccount && emojiSelected !== -1
         ? <>

@@ -26,7 +26,7 @@ export const users = [
   },
   {
     name: 'Xela',
-    address: '0x3f5698e824EAb5475e067550616b6da40F887dbc
+    address: '0x3f5698e824EAb5475e067550616b6da40F887dbc',
     id: 6
   },
   {
